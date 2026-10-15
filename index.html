@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SOWAL3ERRY - Integration Base</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/css/all.min.css" rel="stylesheet"> 
+    
+    <!-- ดึงไฟล์ CSS มาใช้ -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="top-bar"></div>
+    <div class="scanline"></div>
+
+    <!-- =========================================
+         หน้าจอดำตอนเริ่ม (ปุ่มนีออนเหลือง)
+    ========================================= -->
+    <div id="boot-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: #050505; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #fff;">
+        <button id="enter-btn">[ SYSTEM START ]</button>
+        <div id="loading-ui" style="display: none; flex-direction: column; align-items: center; width: 100%; position: relative;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: #fff; letter-spacing: 6px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255,184,0,0.8); z-index: 1; display: flex; align-items: center; gap: 15px;">
+                LOADING <span id="loading-text" style="font-size: 1.2rem; color: #ffb800;">0%</span>
+            </div>
+            <div style="width: 400px; max-width: 90%; height: 30px; border: 2px solid #ffb800; padding: 3px; box-shadow: 0 0 15px rgba(255,184,0,0.3), inset 0 0 10px rgba(255,184,0,0.2); position: relative; z-index: 1; background: rgba(0,0,0,0.5);">
+                <div id="progress-bar" style="width: 0%; height: 100%; background-color: #ffb800; box-shadow: 0 0 10px #ffb800;"></div>
+            </div>
+            <div id="terminal-text" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #fff; margin-top: 25px; width: 400px; max-width: 90%; text-align: left; line-height: 1.6; text-shadow: 0 0 5px rgba(255,255,255,0.4);">
+                <div id="line1" style="opacity: 0;"></div>
+                <div id="line2" style="opacity: 0;"></div>
+                <div id="line3" style="opacity: 0;"></div>
+                <div id="line4" style="opacity: 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- แผ่นสไลด์สีเหลือง ACCESS GRANTED -->
+    <div id="transition-screen" style="position: fixed; top: 0; left: -100%; width: 100%; height: 100vh; background-color: #ffb800; z-index: 10000; display: flex; justify-content: center; align-items: center; transition: left 1.25s cubic-bezier(0.76, 0, 0.24, 1);">
+        <h1 style="color: #000; font-weight: 900; font-size: 4rem; letter-spacing: 5px; font-style: italic;">ACCESS GRANTED</h1>
+    </div>
+
+    <!-- =========================================
+         แถบ Sidebar หลัก
+    ========================================= -->
+    <div class="sidebar">
+        <!-- โลโก้ S3 รีเฟรชได้ -->
+        <div class="sidebar-logo" onclick="location.reload();" title="Refresh Page">
+            <div style="width: 40px; height: 40px; background: black; color: white; display:flex; justify-content:center; align-items:center; margin-left: 15px; font-weight: bold;">S3</div>
+            <div class="logo-text">SOWAL3ERRY</div>
+        </div>
+        
+        <a href="#top" class="nav-link menu-link active"><div class="icon"><i class="fa-regular fa-square-caret-up"></i></div><div class="text">TOP</div></a>        
+        <a href="#intro" class="nav-link menu-link"><div class="icon"><i class="fa-regular fa-clipboard"></i></div><div class="text">INTRODUCTION</div></a>
+        <a href="#works" class="nav-link menu-link"><div class="icon"><i class="fa-solid fa-pen-fancy"></i></div><div class="text">WORKS</div></a>
+        <a href="#activities" class="nav-link menu-link"><div class="icon"><i class="fa-solid fa-person-walking"></i></div><div class="text">ACTIVITIES</div></a>
+   
+        <div class="sidebar-bottom">
+            <audio id="bgm-player" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg"></audio>
+            <a href="#" class="nav-link" id="sound-toggle-btn" style="margin-bottom: 15px;">
+                <div class="icon" id="sound-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg></div>
+                <div class="text" id="sound-text">音声：オフ (Sound: OFF)</div>
+            </a>
+            <div class="social-container">
+                <a href="#" class="social-collapsed"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>
+                <div class="social-expanded">
+                    <a href="https://x.com/HireTune4Xsora" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://www.pixiv.net/en/users/81221206" target="_blank"><i class="fa-brands fa-pixiv"></i></a>
+                    <a href="https://www.facebook.com/Sowal3erry/" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://ko-fi.com/soralinxz" target="_blank"><i class="fa-brands fa-ko-fi"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         เนื้อหาหน้าเว็บหลัก
+    ========================================= -->
+    <div class="main-content">
+        <section id="top" class="content-section">
+            <div class="fui-corner top-left"></div>
+            <div class="fui-corner top-right"></div>
+            <div class="fui-corner bottom-left"></div>
+            <div class="fui-corner bottom-right"></div>
+            
+            <div class="fui-crosshair ch-1">+</div>
+            <div class="fui-crosshair ch-2">+</div>
+            
+            <div class="fui-vertical-text">SYS_REQ // PORTFOLIO.VOL.01</div>
+            <div class="fui-stripes"></div>
+
+            <video loop muted playsinline id="bg-video">
+                <source src="Bgblender.mp4" type="video/mp4">
+            </video>
+            <div class="video-overlay"></div> 
+            
+            <div class="decal tech-font decal-top-left">sys.op.log // v2.04<br>[REC] INITIALIZING...</div>
+            <div class="decal tech-font decal-bottom-right" style="text-align: right;">COORDS: 44.02 N, 10.99 E<br>STATUS: CLEAR</div>
+
+            <div style="position: relative; z-index: 1;">
+                <h1 style="color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 4rem; font-weight: 900; letter-spacing: -2px;"> B.P.R.S Online...</h1>
+                <p style="color: #ccc;">Here is TOP Zone: slide down there to see more activities</p>
+            </div>
+        </section>
+        
+        <section id="intro" class="content-section intro-bg-image">
+            
+            <!-- ชุดของตกแต่งมุมจอ FUI -->
+            <div class="fui-corner top-left"></div>
+            <div class="fui-corner top-right"></div>
+            <div class="fui-corner bottom-left"></div>
+            <div class="fui-corner bottom-right"></div>
+            <div class="fui-crosshair ch-1">+</div>
+            <div class="fui-crosshair ch-2">+</div>
+            <div class="fui-vertical-text">SYS_REQ // PORTFOLIO.VOL.01</div>
+            <div class="fui-stripes"></div>
+
+            <div style="position: relative; z-index: 1;">
+                <h1 style="color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 4rem; font-weight: 900; letter-spacing: -2px;">INTRODUCTION</h1>
+            </div>
+
+            <div class="intro-container">
+                <!-- ฝั่งซ้าย: ข้อความและ Skills -->
+                <div class="intro-text">
+                    <h2>Who am I ?</h2>
+                    <p>
+                        <strong>Hi, I'm SowaBerry </strong> Aka Sowal. I'm an aspiring artist with a passion for exploration, military themes, and "Gijinka" (humanization), though lately, I find myself leaning more toward Kemonomimi designs. I constantly strive to explore new possibilities in visual storytelling by bringing characters with unique identities to reality. I am dedicated to continuously learning and honing my skills whether it's exploring 3D modeling, collaborating on various projects, or exchanging knowledge and experiences with others. From what I've learned, art is far more than just creating a final piece; it is a tool for discovering new things and forging meaningful connections between ourselves, our work, and the people around us
+                    </p>
+
+                    <h3>Skills</h3>
+                    <div class="skill-icons">
+                        <img src="pngwing.com (5).png" alt="Clip Studio Paint">
+                        <img src="Blender_logo_no_text.svg.webp" alt="Blender">
+                        <img src="pngwing.com (2).png" alt="Other Skill">
+                    </div>
+                </div>
+
+                <!-- ฝั่งขวา: รูปภาพ Artwork หลัก (ภาพโชว์) -->
+                <div class="intro-image">
+                    <img src="me.png" alt="Main Artwork">
+                </div>
+            </div>
+        </section>
+
+        <section id="works" class="content-section bg-light-theme">
+            <div class="fui-corner top-left"></div>
+            <div class="fui-corner top-right"></div>
+            <div class="fui-corner bottom-left"></div>
+            <div class="fui-corner bottom-right"></div>
+            
+            <div class="fui-crosshair ch-1">+</div>
+            <div class="fui-crosshair ch-2">+</div>
+            
+            <div class="fui-vertical-text">SYS_REQ // PORTFOLIO.VOL.01</div>
+            <div class="fui-stripes"></div>
+
+            <div style="position: relative; z-index: 1;">
+                <h1 style="color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 4rem; font-weight: 900; letter-spacing: -2px;">WORKS</h1>
+                <div class="works-grid">
+                    <a href="3dmodel.html" class="work-card card-3d" target="_blank" rel="noopener noreferrer">
+                        <img src="1A2 1A1 banner.jpg" class="card-img-top" alt="1A2 1A1 banner.jpg">
+                        <div class="work-title">3D Model / animation</div>
+                    </a>
+                    <a href="character.html" class="work-card card-char" target="_blank" rel="noopener noreferrer">
+                        <img src="Type 61 remake 2.jpg" class="card-img-top" alt="Type 61 remake 2.jpg">
+                        <div class="work-title">Character Design</div>
+                    </a>
+                    <a href="illustration.html" class="work-card card-illu" target="_blank" rel="noopener noreferrer">
+                        <img src="Katysuha.jpg" class="card-img-top" alt="Katysuha.jpg">
+                        <div class="work-title">Illustration</div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+       <section id="activities" class="content-section bg-fui-theme" style="padding: 80px 40px; min-height: 100vh;">
+            
+            <!-- ชุดของตกแต่งมุมจอ FUI -->
+            <div class="fui-corner top-left"></div>
+            <div class="fui-corner top-right"></div>
+            <div class="fui-corner bottom-left"></div>
+            <div class="fui-corner bottom-right"></div>
+            <div class="fui-crosshair ch-1">+</div>
+            <div class="fui-crosshair ch-2">+</div>
+            <div class="fui-vertical-text">SYS_REQ // PORTFOLIO.VOL.01</div>
+            <div class="fui-stripes"></div>
+
+            <div style="position: relative; z-index: 5; width: 100%; max-width: 1400px; margin: 0 auto;">
+                
+                <!-- หัวข้อหน้า -->
+                <h1 style="color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 4rem; font-weight: 900; letter-spacing: -2px; margin-bottom: 5px;">ACTIVITIES</h1>
+                <p style="color: rgba(255, 255, 255, 0.4); font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; font-size: 0.9rem; margin-bottom: 40px; text-transform: uppercase;">
+                    EXPERIENCES // EVENTS // EXHIBITIONS
+                </p>
+                
+                <!-- โซนแกลเลอรีแสดงภาพถ่ายล้วนๆ (ใช้ CSS Grid) -->
+                <div class="activities-gallery">
+                    
+                    <!-- ภาพที่ 1 (ภาพนอนใหญ่) -->
+                    <div class="activity-photo" style="grid-column: span 2; grid-row: span 2;">
+                        <img src="a1.jpg" alt="Activity 1">
+                        <div class="photo-overlay"></div>
+                    </div>
+
+                    <!-- ภาพที่ 2 -->
+                    <div class="activity-photo">
+                        <img src="a3.jpg" alt="Activity 2">
+                        <div class="photo-overlay"></div>
+                    </div>
+
+                    <!-- ภาพที่ 4 -->
+                    <div class="activity-photo">
+                        <img src="a4.jpg" alt="Activity 3">
+                        <div class="photo-overlay"></div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+    <footer class="site-footer">
+            <p>&copy; 2026 SOWAL3ERRY | Portfolio</p>
+    </footer>
+    
+    <!-- ดึงไฟล์ JavaScript มาใช้ (ไว้ล่างสุดเสมอ) -->
+    <script src="script.js"></script>
+</body>
+</html>

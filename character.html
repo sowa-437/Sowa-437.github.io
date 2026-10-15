@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Character Design // SOWAL3ERRY</title>
+    
+    <style>
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background-color: #050505; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease-out;
+        }
+        .loading-text {
+            font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700;
+            color: #ffffff; letter-spacing: 4px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 15px;
+            text-shadow: 0 0 10px rgba(255,184,0,0.5);
+        }
+        .loading-percent { color: #ffb800; }
+        .loading-bar-container {
+            width: 400px; max-width: 80%; height: 15px;
+            border: 1px solid #ffb800; padding: 3px;
+            background: rgba(0,0,0,0.5); box-shadow: 0 0 10px rgba(255,184,0,0.2);
+        }
+        .loading-bar {
+            height: 100%; width: 0%; background-color: #ffb800;
+            box-shadow: 0 0 10px #ffb800; transition: width 0.1s linear;
+        }
+        .loading-subtext {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+            color: #666; margin-top: 15px; letter-spacing: 2px;
+        }
+        /* =========================================
+           1. ตั้งค่าพื้นฐาน (พื้นหลังดำสนิท)
+        ========================================= */
+        body { 
+            margin: 0; padding: 0; 
+            background-color: #000000; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
+        }
+
+        /* โลโก้มุมซ้ายบน */
+        .top-left-logo {
+            position: absolute;
+            top: 20px; left: 20px;
+            z-index: 100; cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .top-left-logo img { width: 45px; height: auto; }
+        .top-left-logo:hover { transform: scale(1.1); opacity: 0.8; }
+
+        /* =========================================
+           2. รูปภาพหลักตรงกลาง (Main Image)
+        ========================================= */
+        .main-image-container {
+            width: 100%;
+            height: 85vh; /* กินพื้นที่บน 85% */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-right: 100px; /* ดันรูปไม่ให้ทับกับแถบขวา */
+        }
+        
+        #main-view {
+            max-width: 100%; max-height: 100%;
+            object-fit: cover; /* เปลี่ยนจาก contain เป็น cover เพื่อให้ขยับสัดส่วนได้ดั่งใจ */
+            object-position: 50% 15%; /* ดันกล้องขึ้นข้างบน เพื่อให้เห็นหน้าตัวละครแบบเต็มๆ */
+            transition: opacity 0.3s ease-in-out;
+            border-radius: 4px;
+        }
+
+        /* สำหรับ Thumbnail และ Side Gallery เพื่อรักษาตําแหน่งใบหน้า */
+        .gallery-thumb {
+            width: 70px; height: 70px;
+            object-fit: cover;
+            object-position: top center; /* บังคับให้พรีวิวรูปเห็นส่วนหัวตัวละครก่อนเสมอ */
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        /* =========================================
+           3. แถบเลือกโปรเจกต์ ด้านล่าง (Bottom - Projects)
+        ========================================= */
+        .project-container {
+            height: 15vh; 
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; 
+            z-index: 10;
+        }
+
+        .project-thumb {
+            width: 120px; height: 70px;
+            object-fit: cover;
+            object-position: top center;
+            cursor: pointer;
+            opacity: 0.3; 
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .project-thumb:hover { opacity: 0.8; }
+        .project-thumb.active-project {
+            opacity: 1;
+            border-color: #ffb800; 
+            transform: scale(1.05);
+        }
+
+        /* =========================================
+           4. แถบรูปรวมมุมต่างๆ ด้านขวา (Right - Gallery View)
+        ========================================= */
+        .side-gallery {
+            position: absolute;
+            right: 0; 
+            top: 0;
+            width: 100px;
+            height: 100vh;
+            background-color: transparent; 
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+            gap: 15px;
+            z-index: 50;
+            padding-right: 20px;
+        }
+
+        .gallery-thumb {
+            width: 70px; height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .gallery-thumb:hover { opacity: 0.8; }
+        .gallery-thumb.active-view {
+            opacity: 1;
+            border-color: #ffffff; 
+        }
+    </style>
+</head>
+<body>
+    <!-- หน้าจอ Loading เริ่มต้น -->
+    <div id="loading-screen">
+        <div class="loading-text">
+            LOADING ASSETS <span class="loading-percent" id="loading-percent">0%</span>
+        </div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loading-bar"></div>
+        </div>
+        <div class="loading-subtext" id="loading-subtext">MOUNTING DATA...</div>
+    </div>
+
+    <!-- โลโก้มุมซ้ายบน (กดแล้วปิดหน้านี้ไปเลย) -->
+    <a href="javascript:void(0);" onclick="window.close();" class="top-left-logo" title="Close Page">
+        <!-- ใส่ชื่อไฟล์รูปโลโก้ของคุณตรงนี้ -->
+        <img src="Screenshot 2026-10-13 082156.png" alt="Close Page">
+    </a>
+
+    <!-- พื้นที่แสดงรูปหลัก / วิดีโอหลัก -->
+    <div class="main-image-container">
+        <!-- ตัวโชว์ภาพ -->
+        <img id="main-view" src="Type 61 remake 2.jpg" alt="Main Render">
+        
+        <!-- ตัวโชว์วิดีโอ (ซ่อนไว้ก่อน เริ่มต้นยังไม่ใช้) -->
+        <video id="main-video" autoplay loop muted playsinline style="display: none;"></video>
+    </div>
+
+    <!-- แถบด้านขวา (รูปมุมต่างๆ ของโปรเจกต์นั้นๆ) -->
+    <div class="side-gallery" id="right-gallery">
+        <!-- ข้อมูลจะถูกสร้างอัตโนมัติด้วย JavaScript -->
+    </div>
+
+    <!-- แถบด้านล่าง (เลือกหมวดโปรเจกต์หลัก) -->
+    <div class="project-container">
+        <img class="project-thumb active-project" src="Type 61 remake 2.jpg" onclick="loadProject('Type 61', this)">
+        <img class="project-thumb" src="Type 93 missile spaa_cap.jpg" onclick="loadProject('Type 93', this)">
+        <img class="project-thumb" src="116285811_p0.jpg" onclick="loadProject('EMU1A', this)">
+    </div>
+
+    <!-- =========================================
+         JavaScript (ระบบควบคุมทั้งหมด)
+    ========================================= -->
+    <script>
+        // ฐานข้อมูลรูปภาพและวิดีโอ
+        const projectDatabase = {
+            'Type 61': {
+                views: [
+                    'Type 61 remake 2.jpg', 
+                    'Type 61 remake.jfif',                 ]
+            },
+            'Type 93': {
+                views: [
+                    'Type 93 missile spaa_cap.jpg',
+                    'Type 93 missile spaa.png',
+                ]
+            },
+            'EMU1A': {
+                views: [
+                    '116285811_p0.jpg',
+                    'EMU-1A 2026 BG.png',
+                ]
+            }
+        };
+
+        // 1. โหลดข้อมูลโปรเจกต์ไปสร้างแถบขวา
+        function loadProject(projectId, element) {
+            document.querySelectorAll('.project-thumb').forEach(thumb => thumb.classList.remove('active-project'));
+            element.classList.add('active-project');
+
+            const data = projectDatabase[projectId];
+            const rightGallery = document.getElementById('right-gallery');
+            rightGallery.innerHTML = ''; 
+            
+            data.views.forEach((fileSrc, index) => {
+                let mediaElement;
+                
+                // เช็กว่าเป็นวิดีโอไหม เพื่อเอามาทำ Thumbnail ด้านขวา
+                if (fileSrc.endsWith('.mp4')) {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = fileSrc;
+                    mediaElement.muted = true;
+                    mediaElement.loop = true;
+                    mediaElement.autoplay = true; // เล่นอัตโนมัติใน Thumbnail 
+                } else {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = fileSrc;
+                }
+                
+                mediaElement.className = 'gallery-thumb';
+                mediaElement.onclick = function() { changeMainImage(fileSrc, this); };
+                rightGallery.appendChild(mediaElement);
+            });
+
+            // ดึงไฟล์แรกมาแสดงทันที
+            if (rightGallery.firstChild) {
+                rightGallery.firstChild.click();
+            }
+        }
+
+        // 2. ฟังก์ชันเปลี่ยนภาพ/วิดีโอตรงกลาง
+        function changeMainImage(fileSrc, element) {
+            const mainImg = document.getElementById('main-view');
+            const mainVid = document.getElementById('main-video');
+            
+            // เช็กนามสกุลไฟล์
+            if (fileSrc.endsWith('.mp4')) {
+                // โหมดวิดีโอ: ซ่อนรูปภาพ เปิดวิดีโอ
+                mainImg.style.display = 'none';
+                mainVid.style.display = 'block';
+                
+                mainVid.style.opacity = 0;
+                setTimeout(() => {
+                    mainVid.src = fileSrc;
+                    mainVid.play();
+                    mainVid.style.opacity = 1;
+                }, 150);
+            } else {
+                // โหมดรูปภาพ: ซ่อนวิดีโอ เปิดรูปภาพ
+                mainVid.style.display = 'none';
+                mainVid.pause();
+                mainImg.style.display = 'block';
+                
+                mainImg.style.opacity = 0;
+                setTimeout(() => {
+                    mainImg.src = fileSrc;
+                    mainImg.style.opacity = 1;
+                }, 150);
+            }
+
+            // จัดการกรอบสีขาวด้านขวา
+            document.querySelectorAll('.gallery-thumb').forEach(thumb => thumb.classList.remove('active-view'));
+            if(element) element.classList.add('active-view');
+        }
+
+        // เริ่มต้นทำงาน (โหลด Gepard)
+        window.onload = () => {
+            const firstProjectThumb = document.querySelector('.project-thumb');
+            loadProject('Type 61', firstProjectThumb);
+        };
+        window.onload = () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const progressBar = document.getElementById('loading-bar');
+            const progressText = document.getElementById('loading-percent');
+            const subText = document.getElementById('loading-subtext');
+            
+            let currentProgress = 0;
+            
+            const loadingInterval = setInterval(() => {
+                currentProgress += Math.floor(Math.random() * 15) + 5; 
+                
+                if (currentProgress > 40) subText.innerText = "RENDERING TEXTURES...";
+                if (currentProgress > 80) subText.innerText = "FINALIZING SCENE...";
+
+                if (currentProgress >= 100) {
+                    currentProgress = 100;
+                    clearInterval(loadingInterval);
+                    subText.innerText = "ACCESS GRANTED";
+                    
+                    setTimeout(() => {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                            
+                            // ⚠️ จุดที่ต้องแก้: เปลี่ยนคำว่า 'gepard' เป็น ID โปรเจกต์แรกของหน้านั้นๆ 
+                            const firstProjectThumb = document.querySelector('.project-thumb');
+                            loadProject('ใส่_ID_โปรเจกต์แรกของหน้านี้_ตรงนี้', firstProjectThumb);
+                            
+                        }, 800); 
+                    }, 500);
+                }
+                
+                progressBar.style.width = currentProgress + '%';
+                progressText.innerText = currentProgress + '%';
+            }, 100); 
+        };
+    </script>
+</body>
+</html>
